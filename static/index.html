@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能针灸辨证选穴助手 - AcuPredictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            padding: 30px 0;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .search-box {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .search-input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .search-input-group input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .search-input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-input-group button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .search-input-group button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .conditions-box {
+            margin-top: 15px;
+        }
+
+        .conditions-box label {
+            display: block;
+            margin-bottom: 10px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .condition-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .condition-tag {
+            padding: 8px 16px;
+            background: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .condition-tag:hover {
+            border-color: #667eea;
+        }
+
+        .condition-tag.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .results-section {
+            margin-top: 30px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .result-title {
+            font-size: 1.4em;
+            color: #333;
+        }
+
+        .result-pattern {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .result-meridian {
+            color: #888;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+
+        .points-section {
+            margin: 20px 0;
+        }
+
+        .points-section h3 {
+            color: #667eea;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .point-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .point-chip {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .point-chip:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .point-chip.main {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .point-chip.main:hover {
+            transform: scale(1.05);
+        }
+
+        .logic-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .logic-box h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .needle-tip {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .needle-tip h4 {
+            color: #856404;
+            margin-bottom: 8px;
+        }
+
+        .point-detail-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .point-detail-modal.show {
+            display: flex;
+        }
+
+        .point-detail-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .point-detail-content h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .point-detail-content p {
+            margin: 10px 0;
+            color: #666;
+        }
+
+        .point-detail-content .close-btn {
+            margin-top: 20px;
+            padding: 10px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.1em;
+        }
+
+        footer {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            padding: 30px 0;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .search-input-group {
+                flex-direction: column;
+            }
+
+            .result-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>智能针灸辨证选穴助手</h1>
+            <p>基于中医针灸理论 · 智能推荐穴位配伍</p>
+        </header>
+
+        <div class="search-box">
+            <div class="search-input-group">
+                <input type="text" id="symptomInput" placeholder="请输入症状，如：头痛、失眠、胃痛..." autocomplete="off">
+                <button onclick="searchAcupoints()">智能选穴</button>
+            </div>
+
+            <div class="conditions-box">
+                <label>选择辨证条件（可选，帮助精准辨证）：</label>
+                <div class="condition-tags" id="conditionTags">
+                    <span class="condition-tag" data-condition="受寒">受寒</span>
+                    <span class="condition-tag" data-condition="急躁">急躁易怒</span>
+                    <span class="condition-tag" data-condition="乏力">乏力</span>
+                    <span class="condition-tag" data-condition="情绪">情绪因素</span>
+                    <span class="condition-tag" data-condition="失眠">失眠</span>
+                    <span class="condition-tag" data-condition="眩晕">眩晕</span>
+                    <span class="condition-tag" data-condition="口苦">口苦口干</span>
+                    <span class="condition-tag" data-condition="气虚">气虚</span>
+                    <span class="condition-tag" data-condition="血虚">血虚</span>
+                    <span class="condition-tag" data-condition="阴虚">阴虚</span>
+                    <span class="condition-tag" data-condition="阳虚">阳虚</span>
+                    <span class="condition-tag" data-condition="痰湿">痰湿</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <!-- 结果将在这里显示 -->
+        </div>
+
+        <footer>
+            <p>AcuPredictor v1.0 · 仅供学习参考，实际针灸请咨询专业医师</p>
+        </footer>
+    </div>
+
+    <!-- 穴位详情弹窗 -->
+    <div class="point-detail-modal" id="pointDetailModal">
+        <div class="point-detail-content">
+            <h3 id="modalPointName">穴位名称</h3>
+            <p><strong>所属经络：</strong><span id="modalMeridian"></span></p>
+            <p><strong>定位：</strong><span id="modalLocation"></span></p>
+            <button class="close-btn" onclick="closeModal()">关闭</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let selectedConditions = [];
+
+        // 初始化条件标签点击事件
+        document.querySelectorAll('.condition-tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                updateSelectedConditions();
+            });
+        });
+
+        function updateSelectedConditions() {
+            selectedConditions = Array.from(document.querySelectorAll('.condition-tag.selected'))
+                .map(tag => tag.dataset.condition);
+        }
+
+        // 回车搜索
+        document.getElementById('symptomInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchAcupoints();
+            }
+        });
+
+        async function searchAcupoints() {
+            const symptom = document.getElementById('symptomInput').value.trim();
+            if (!symptom) {
+                alert('请输入症状');
+                return;
+            }
+
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.innerHTML = '<div class="loading">正在分析辨证...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/search`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query: symptom,
+                        conditions: selectedConditions
+                    })
+                });
+
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                resultsSection.innerHTML = `<div class="no-results">搜索出错：${error.message}</div>`;
+            }
+        }
+
+        function displayResults(data) {
+            const resultsSection = document.getElementById('resultsSection');
+
+            if (data.results.length === 0) {
+                resultsSection.innerHTML = `<div class="no-results">${data.message}</div>`;
+                return;
+            }
+
+            let html = '';
+            data.results.forEach((result, index) => {
+                html += `
+                    <div class="result-card">
+                        <div class="result-header">
+                            <div class="result-title">${result.symptom} - ${result.pattern}</div>
+                            <span class="result-pattern">${result.pattern}</span>
+                        </div>
+
+                        <div class="result-meridian">
+                            <strong>涉及经络：</strong>${result.meridian}
+                        </div>
+
+                        <div class="points-section">
+                            <h3>主穴（核心穴位）</h3>
+                            <div class="point-chips">
+                                ${result.main_points.map(p => `
+                                    <span class="point-chip main" onclick="showPointDetail('${p}', ${JSON.stringify(result.point_details[p]).replace(/"/g, '&quot;')})">${p}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="points-section">
+                            <h3>配穴（辅助穴位）</h3>
+                            <div class="point-chips">
+                                ${result.auxiliary_points.map(p => `
+                                    <span class="point-chip" onclick="showPointDetail('${p}', ${JSON.stringify(result.point_details[p]).replace(/"/g, '&quot;')})">${p}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="logic-box">
+                            <h4>辨证逻辑</h4>
+                            <p>${result.logic}</p>
+                        </div>
+
+                        <div class="needle-tip">
+                            <h4>针刺注意</h4>
+                            <p>${result.needle_tips}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            resultsSection.innerHTML = `<p style="color:white; margin-bottom:15px;">${data.message}</p>` + html;
+        }
+
+        function showPointDetail(pointName, details) {
+            document.getElementById('modalPointName').textContent = pointName;
+            document.getElementById('modalMeridian').textContent = details.meridian || '未知';
+            document.getElementById('modalLocation').textContent = details.location || '暂无定位信息';
+            document.getElementById('pointDetailModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('pointDetailModal').classList.remove('show');
+        }
+
+        // 点击模态框背景关闭
+        document.getElementById('pointDetailModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // ESC 关闭模态框
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
