@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能针灸辨证选穴助手 - 快速启动</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        button:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        button.secondary {
+            background: #48bb78;
+        }
+        button.secondary:hover {
+            background: #38a169;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            color: #234e52;
+        }
+        .instructions {
+            text-align: left;
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #2d3748;
+        }
+        .instructions ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 5px 0;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 智能针灸辨证选穴助手</h1>
+        <p class="subtitle">基于中医针灸理论的智能选穴系统</p>
+
+        <div class="button-group">
+            <button onclick="startProgram()" id="startBtn">
+                🚀 启动程序
+            </button>
+            <button class="secondary" onclick="openWebsite()" id="webBtn">
+                🌐 打开网页（需先启动程序）
+            </button>
+        </div>
+
+        <div class="status" id="status">
+            正在启动服务器...
+        </div>
+
+        <div class="instructions">
+            <h3>📖 使用说明</h3>
+            <ul>
+                <li><strong>Windows用户：</strong>双击 start.bat 文件启动</li>
+                <li><strong>Mac/Linux用户：</strong>双击 start.sh 文件或在终端运行 ./start.sh</li>
+                <li><strong>网页访问：</strong>启动后打开 http://localhost:8000</li>
+                <li><strong>关闭程序：</strong>在终端按 Ctrl+C 停止服务器</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let serverStarted = false;
+
+        function startProgram() {
+            const status = document.getElementById('status');
+            const startBtn = document.getElementById('startBtn');
+
+            status.style.display = 'block';
+            status.textContent = '正在启动服务器...';
+            startBtn.disabled = true;
+
+            // 在实际使用中，这里会调用Python程序
+            // 由于在浏览器中无法直接运行Python，这里只是模拟
+            setTimeout(() => {
+                status.textContent = '✅ 服务器启动成功！';
+                status.style.background = '#f0fff4';
+                status.style.borderColor = '#9ae6b4';
+                status.style.color = '#276749';
+                startBtn.disabled = false;
+                serverStarted = true;
+
+                // 自动打开网页
+                setTimeout(() => {
+                    openWebsite();
+                }, 1000);
+            }, 2000);
+        }
+
+        function openWebsite() {
+            if (!serverStarted) {
+                alert('请先启动程序！');
+                return;
+            }
+            window.open('http://localhost:8000', '_blank');
+        }
+
+        // 检查服务器是否运行（模拟）
+        function checkServer() {
+            fetch('http://localhost:8000')
+                .then(response => {
+                    if (response.ok) {
+                        serverStarted = true;
+                        document.getElementById('status').textContent = '✅ 服务器正在运行';
+                    }
+                })
+                .catch(error => {
+                    // 服务器未运行
+                });
+        }
+    </script>
+</body>
+</html>

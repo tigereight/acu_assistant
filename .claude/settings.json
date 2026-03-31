@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/a1234/.claude/skills/**)",
+      "Bash(for dir:*)",
+      "Bash(do echo:*)",
+      "Read(//Users/a1234/Claude/test/acu_assistant/**)",
+      "Bash(done)",
+      "Bash(python3 -c \"import json; json.load\\(open\\(''/Users/a1234/Claude/test/acu_assistant/data/acupoints.json''\\)\\); print\\(''JSON格式正确''\\)\")",
+      "Bash(python3 -c \"import json; data=json.load\\(open\\(''/Users/a1234/Claude/test/acu_assistant/data/acupoints.json''\\)\\); print\\(len\\(data[''symptoms'']\\)\\)\")",
+      "Bash(chmod +x /Users/a1234/Claude/test/acu_assistant/start.sh)"
+    ]
+  }
+}
